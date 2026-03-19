@@ -1,0 +1,114 @@
+services:
+  # ─── PostgreSQL Database ───────────────────────────────────────────
+  rc-postgresql:
+    build:
+      context: ./docker/postgresql
+      dockerfile: Dockerfile
+    container_name: rc-postgresql
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-remotecontrol}
+      POSTGRES_USER: ${POSTGRES_USER:-rcadmin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rc_secret_change_me_in_production}
+    ports:
+      - "${RC_POSTGRES_PORT:-7483}:5432"
+    volumes:
+      - rc-pgdata:/var/lib/postgresql/data
+    networks:
+      - rc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rcadmin} -d ${POSTGRES_DB:-remotecontrol}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ─── PgBouncer Connection Pool ─────────────────────────────────────
+  rc-pgbouncer:
+    build:
+      context: ./docker/pgbouncer
+      dockerfile: Dockerfile
+    container_name: rc-pgbouncer
+    ports:
+      - "${RC_PGBOUNCER_PORT:-7484}:6432"
+    networks:
+      - rc-network
+    depends_on:
+      rc-postgresql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ─── C Server (HTTP API + UDP/DTLS Socket) ─────────────────────────
+  rc-server:
+    build:
+      context: .
+      dockerfile: ./docker/c-server/Dockerfile
+    container_name: rc-server
+    env_file:
+      - .env
+    environment:
+      RC_DB_HOST: rc-pgbouncer
+      RC_DB_PORT: 6432
+      RC_DB_NAME: ${POSTGRES_DB:-remotecontrol}
+      RC_DB_USER: ${POSTGRES_USER:-rcadmin}
+      RC_DB_PASSWORD: ${POSTGRES_PASSWORD:-rc_secret_change_me_in_production}
+      MAIL_HOST: ${MAIL_HOST:-sandbox.smtp.mailtrap.io}
+      MAIL_PORT: ${MAIL_PORT:-2525}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM_EMAIL: ${MAIL_FROM_EMAIL:-noreply@remotecontrol.rs}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-RemoteControl}
+      RC_API_PORT: 7481
+      RC_SOCKET_PORT: 7482
+    ports:
+      - "${RC_API_PORT:-7481}:7481"
+      - "${RC_SOCKET_PORT:-7482}:7482/udp"
+    networks:
+      - rc-network
+    depends_on:
+      rc-pgbouncer:
+        condition: service_started
+    restart: unless-stopped
+
+  # ─── Nginx Reverse Proxy ───────────────────────────────────────────
+  rc-nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: rc-nginx
+    ports:
+      - "443:443"
+    networks:
+      - rc-network
+    depends_on:
+      - rc-server
+      - rc-pgadmin
+    restart: unless-stopped
+
+  # ─── PgAdmin ──────────────────────────────────────────────────────
+  rc-pgadmin:
+    build:
+      context: ./docker/pgadmin
+      dockerfile: Dockerfile
+    container_name: rc-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@remotecontrol.rs}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-pgadmin_secret_change_me}
+      SCRIPT_NAME: /pgadmin
+    volumes:
+      - rc-pgadmin-data:/var/lib/pgadmin
+    networks:
+      - rc-network
+    depends_on:
+      rc-postgresql:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  rc-network:
+    driver: bridge
+
+volumes:
+  rc-pgdata:
+    driver: local
+  rc-pgadmin-data:
+    driver: local

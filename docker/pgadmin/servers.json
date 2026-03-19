@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "RemoteControl DB",
+            "Group": "Servers",
+            "Host": "rc-postgresql",
+            "Port": 5432,
+            "MaintenanceDB": "remotecontrol",
+            "Username": "rcadmin",
+            "SSLMode": "prefer"
+        }
+    }
+}

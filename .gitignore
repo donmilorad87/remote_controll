@@ -1,0 +1,46 @@
+# Environment files with secrets
+.env.production
+.env.local
+
+# Build artifacts
+backend/build/
+backend/*.o
+backend/remotecontrol-server
+desktop/windows/build/
+desktop/windows/*.exe
+desktop/windows/*.obj
+desktop/mac/build/
+desktop/mac/remotecontrol-desktop
+desktop/linux/build/
+desktop/linux/remotecontrol-desktop
+
+# Flutter
+mobile/.dart_tool/
+mobile/.packages
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/pubspec.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SSL certs (generated locally)
+docker/nginx/certs/
+docker/c-server/certs/
+
+# Docker volumes
+docker/postgresql/data/
+docker/pgadmin/data/

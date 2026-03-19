@@ -1,0 +1,85 @@
+# Cross-compile RemoteControl Windows desktop app (32-bit) from Ubuntu
+#
+# Usage:
+#   make -f Makefile.mingw32 deps    # Download 32-bit Windows libraries (once)
+#   make -f Makefile.mingw32         # Build 32-bit .exe
+#   make -f Makefile.mingw32 package # Create ready-to-run folder
+
+CC = i686-w64-mingw32-gcc
+
+DEPS_DIR = deps/win32
+CURL_DIR = $(DEPS_DIR)/curl
+JANSSON_DIR = $(DEPS_DIR)/jansson
+
+CFLAGS = -Wall -Wextra -Werror -std=c11 -O2 \
+         -I../shared \
+         -I$(CURL_DIR)/include \
+         -I$(JANSSON_DIR)/include
+
+LDFLAGS = -L$(CURL_DIR)/lib \
+          -L$(JANSSON_DIR)/lib \
+          -lcurl \
+          -ljansson \
+          -lws2_32 -lwinmm -lshell32 -luser32 -lole32 -lcomctl32 -lgdi32 \
+          -loleaut32 -luuid \
+          -mwindows
+
+SOURCES = main.c input_win32.c volume_win32.c client_net.c login_window.c tray.c
+OBJECTS = $(SOURCES:.c=.o)
+TARGET = remotecontrol-desktop.exe
+
+.PHONY: all clean deps package
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CC) -o $@ $^ $(LDFLAGS)
+	@echo ""
+	@echo "=== Build successful: $(TARGET) (32-bit) ==="
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+deps:
+	@echo "=== Downloading 32-bit Windows dependencies ==="
+	mkdir -p $(DEPS_DIR)
+
+	@echo "--- Downloading curl for MinGW (32-bit) ---"
+	mkdir -p $(CURL_DIR)
+	curl -L -o /tmp/curl-win32.zip \
+		"https://curl.se/windows/dl-8.12.1_1/curl-8.12.1_1-win32-mingw.zip"
+	unzip -o /tmp/curl-win32.zip -d /tmp/curl-extract32
+	cp -r /tmp/curl-extract32/curl-*/include $(CURL_DIR)/
+	cp -r /tmp/curl-extract32/curl-*/lib $(CURL_DIR)/
+	cp -r /tmp/curl-extract32/curl-*/bin $(CURL_DIR)/
+	rm -rf /tmp/curl-win32.zip /tmp/curl-extract32
+
+	@echo "--- Building jansson from source for MinGW (32-bit) ---"
+	mkdir -p /tmp/jansson-build32
+	curl -L -o /tmp/jansson32.tar.gz \
+		"https://github.com/akheron/jansson/releases/download/v2.14/jansson-2.14.tar.gz"
+	tar xzf /tmp/jansson32.tar.gz -C /tmp/jansson-build32 --strip-components=1
+	cd /tmp/jansson-build32 && \
+		./configure --host=i686-w64-mingw32 --prefix=$(CURDIR)/$(JANSSON_DIR) \
+		--enable-static --disable-shared && \
+		make -j$$(nproc) && \
+		make install
+	rm -rf /tmp/jansson32.tar.gz /tmp/jansson-build32
+
+	@echo "=== 32-bit dependencies ready ==="
+
+package: $(TARGET)
+	@echo "=== Creating 32-bit package ==="
+	mkdir -p dist32
+	cp $(TARGET) dist32/
+	cp .env dist32/
+	@if [ -d "$(CURL_DIR)/bin" ]; then \
+		cp $(CURL_DIR)/bin/*.dll dist32/ 2>/dev/null || true; \
+	fi
+	@echo ""
+	@echo "=== Package ready in dist32/ ==="
+	@ls -la dist32/
+
+clean:
+	rm -f $(OBJECTS) $(TARGET)
+	rm -rf dist32

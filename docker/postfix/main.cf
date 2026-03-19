@@ -1,0 +1,33 @@
+# Postfix main configuration for RemoteControl
+smtpd_banner = $myhostname ESMTP
+biff = no
+append_dot_mydomain = no
+readme_directory = no
+
+# Network
+inet_interfaces = all
+inet_protocols = ipv4
+mynetworks = 172.16.0.0/12 192.168.0.0/16 10.0.0.0/8 127.0.0.0/8
+
+# Domain
+myhostname = mail.remotecontrol.rs
+mydomain = remotecontrol.rs
+myorigin = $mydomain
+mydestination = $myhostname, localhost.$mydomain, localhost
+
+# Delivery
+mailbox_size_limit = 0
+recipient_delimiter = +
+
+# Queue
+maximal_queue_lifetime = 1h
+bounce_queue_lifetime = 1h
+maximal_backoff_time = 300s
+minimal_backoff_time = 60s
+
+# Limits
+smtpd_client_connection_rate_limit = 50
+smtpd_client_message_rate_limit = 100
+
+# SMTP port override (listen on 7486 internally mapped from container)
+# The container maps 7486 externally, postfix listens on 25 inside
