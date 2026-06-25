@@ -1,0 +1,7 @@
+[    2453ms] [ERROR] Access to script at 'https://embed.tawk.to/69041ece176d021956a832b5/1j8s1gm8n' from origin 'https://www.visifib.ca' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.visifib.ca/en/our-visifib-gallery-3/:1821
+[    2453ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://embed.tawk.to/69041ece176d021956a832b5/1j8s1gm8n:0
+[    2477ms] [ERROR] Access to font at 'https://www.dd-time.com/wp-content/uploads/elementor/google-fonts/fonts/roboto-kfo7cnqeu92fr1me7ksn66agldtyluama3yuba.woff2' from origin 'https://www.visifib.ca' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.visifib.ca/en/our-visifib-gallery-3/:1854
+[    2477ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://www.dd-time.com/wp-content/uploads/elementor/google-fonts/fonts/roboto-kfo7cnqeu92fr1me7ksn66agldtyluama3yuba.woff2:0
+[    5323ms] Error: Minified React error #299; visit https://react.dev/errors/299 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at Li.createRoot (https://www.visifib.ca/wp-content/uploads/react-configurator/assets/index-CEHxvV-G.js:49:33267)
+    at https://www.visifib.ca/wp-content/uploads/react-configurator/assets/index-CEHxvV-G.js:55:38282

@@ -1,8 +1,0 @@
-  Now you can access:
-  - https://local.remotecontrol.rs/admin/ — Admin panel
-  - https://local.remotecontrol.rs/pgadmin/ — PgAdmin
-  - https://local.remotecontrol.rs/health — Health check
-  - https://local.remotecontrol.rs/api/* — REST API
-
-
-read logs : docker logs -f rc-server

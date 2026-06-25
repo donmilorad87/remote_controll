@@ -63,6 +63,13 @@ void rc_input_move_cursor(uint8_t direction, uint8_t speed)
     XFlush(g_display);
 }
 
+void rc_input_move_cursor_relative(int16_t dx, int16_t dy)
+{
+    assert(g_display != NULL);
+    XTestFakeRelativeMotionEvent(g_display, (int)dx, (int)dy, 0);
+    XFlush(g_display);
+}
+
 void rc_input_mouse_click(uint8_t button)
 {
     assert(g_display != NULL);

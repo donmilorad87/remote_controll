@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'providers/auth_provider.dart';
-import 'providers/connection_provider.dart';
-import 'screens/login_screen.dart';
-import 'screens/control_screen.dart';
+import 'providers/remote_provider.dart';
+import 'screens/discovery_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+void main() {
   runApp(const RemoteControlApp());
 }
 
@@ -17,14 +12,8 @@ class RemoteControlApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProxyProvider<AuthProvider, ConnectionProvider>(
-          create: (_) => ConnectionProvider(),
-          update: (_, auth, conn) => conn!..updateAuth(auth),
-        ),
-      ],
+    return ChangeNotifierProvider(
+      create: (_) => RemoteProvider(),
       child: MaterialApp(
         title: 'RemoteControl',
         debugShowCheckedModeBanner: false,
@@ -33,14 +22,7 @@ class RemoteControlApp extends StatelessWidget {
           useMaterial3: true,
           brightness: Brightness.dark,
         ),
-        home: Consumer<AuthProvider>(
-          builder: (context, auth, _) {
-            if (auth.isAuthenticated) {
-              return const ControlScreen();
-            }
-            return const LoginScreen();
-          },
-        ),
+        home: const DiscoveryScreen(),
       ),
     );
   }

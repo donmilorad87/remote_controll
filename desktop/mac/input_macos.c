@@ -54,6 +54,23 @@ void rc_input_move_cursor(uint8_t direction, uint8_t speed)
     }
 }
 
+void rc_input_move_cursor_relative(int16_t dx, int16_t dy)
+{
+    CGEventRef get_pos = CGEventCreate(NULL);
+    CGPoint pos = CGEventGetLocation(get_pos);
+    CFRelease(get_pos);
+
+    pos.x += dx;
+    pos.y += dy;
+
+    CGEventRef move = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved,
+                                               pos, kCGMouseButtonLeft);
+    if (move != NULL) {
+        CGEventPost(kCGHIDEventTap, move);
+        CFRelease(move);
+    }
+}
+
 void rc_input_mouse_click(uint8_t button)
 {
     CGEventRef get_pos = CGEventCreate(NULL);

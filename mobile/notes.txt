@@ -1,0 +1,8 @@
+flutter build apk --release
+
+ cd ~/Desktop/remote/mobile/build/app/outputs/flutter-apk/
+  python3 -m http.server 8080
+
+  Then on your Android phone's browser go to:
+
+  http://192.168.0.108:8080/app-release.apk

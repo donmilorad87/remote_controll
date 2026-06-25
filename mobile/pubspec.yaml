@@ -1,5 +1,5 @@
 name: remotecontrol_mobile
-description: RemoteControl mobile app - control your desktop from your phone.
+description: RemoteControl - control your desktop from your phone over LAN.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,8 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.1.1
-  flutter_dotenv: ^5.1.0
-  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -20,5 +18,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - .env

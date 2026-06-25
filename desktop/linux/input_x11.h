@@ -10,8 +10,11 @@ int rc_input_init(void);
 /* Shutdown X11 input subsystem. */
 void rc_input_shutdown(void);
 
-/* Move cursor by relative delta. direction is RC_DIR_* constant, speed 1-10. */
+/* Move cursor by discrete direction. direction is RC_DIR_* constant, speed 1-10. */
 void rc_input_move_cursor(uint8_t direction, uint8_t speed);
+
+/* Move cursor by precise relative pixel delta (touchpad). */
+void rc_input_move_cursor_relative(int16_t dx, int16_t dy);
 
 /* Simulate mouse button click.
    button: RC_MOUSE_LEFT, RC_MOUSE_MIDDLE, RC_MOUSE_RIGHT */

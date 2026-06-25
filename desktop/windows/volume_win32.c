@@ -77,6 +77,9 @@ void rc_volume_handle(uint8_t action)
 
     switch (action) {
     case RC_VOL_UP:
+        /* Unmute first if muted, then increase */
+        g_volume->lpVtbl->GetMute(g_volume, &is_muted);
+        if (is_muted) g_volume->lpVtbl->SetMute(g_volume, FALSE, NULL);
         g_volume->lpVtbl->GetMasterVolumeLevelScalar(g_volume, &current);
         current += VOLUME_STEP;
         if (current > 1.0f) current = 1.0f;
@@ -84,6 +87,9 @@ void rc_volume_handle(uint8_t action)
         break;
 
     case RC_VOL_DOWN:
+        /* Unmute first if muted, then decrease */
+        g_volume->lpVtbl->GetMute(g_volume, &is_muted);
+        if (is_muted) g_volume->lpVtbl->SetMute(g_volume, FALSE, NULL);
         g_volume->lpVtbl->GetMasterVolumeLevelScalar(g_volume, &current);
         current -= VOLUME_STEP;
         if (current < 0.0f) current = 0.0f;

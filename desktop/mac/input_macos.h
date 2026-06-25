@@ -6,6 +6,7 @@
 int rc_input_init(void);
 void rc_input_shutdown(void);
 void rc_input_move_cursor(uint8_t direction, uint8_t speed);
+void rc_input_move_cursor_relative(int16_t dx, int16_t dy);
 void rc_input_mouse_click(uint8_t button);
 void rc_input_mouse_scroll(int8_t direction);
 void rc_input_key_press(uint16_t keycode, uint8_t modifiers);
